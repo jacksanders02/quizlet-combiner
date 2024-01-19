@@ -14,13 +14,16 @@ from colorama import Fore, Style
 
 
 def main():
+    """
+    Detects duplicate terms/definitions in a study set, and prompts the user to action them.
+    """
     study_set = ""
     while not os.path.exists(f"study-sets/{study_set}.tsv"):
         study_set = input("Enter study set to find duplicates for: ")
 
     flashcards = {}
     n_loaded = 0
-    with open(f"study-sets/{study_set}.tsv", "r") as f:
+    with open(f"study-sets/{study_set}.tsv", "r", encoding="utf-8") as f:
         reader = csv.reader(f, delimiter='\t')
         for fc in reader:
             term = fc[0].lower().strip()
@@ -43,7 +46,8 @@ def main():
             n_changes += 1
             print(f"""\nDuplicate term "{term}": Possible definitions {defs}""")
             for definition in defs:
-                action = input(f"""Enter new term for definition "{definition}", or type 'del' to delete $ """)
+                action = input(f'Enter new term for definition "{definition}",'
+                               "or type 'del' to delete $ ")
                 if action.lower() != 'del':
                     if action.strip() == "":
                         action = term
@@ -64,7 +68,8 @@ def main():
             n_changes += 1
             print(f"""\nDuplicate definition "{definition}": Possible terms {terms}""")
             for term in terms:
-                action = input(f"""Enter new definition for term "{term}", or type 'del' to delete $ """)
+                action = input(f'Enter new definition for term "{term}",'
+                               "or type 'del' to delete $ ")
                 if action.lower() != 'del':
                     if action.strip() == "":
                         action = definition
@@ -75,8 +80,9 @@ def main():
     ufs = [[i[0], i[1]] for i in unique_flashcards.items()]
 
     if n_changes > 0:
-        with open(f"study-sets/{study_set}-unique.tsv", "w") as f:
+        with open(f"study-sets/{study_set}-unique.tsv", "w", encoding="utf-8") as f:
             csv.writer(f, delimiter='\t').writerows(ufs)
+        print(f"New flashcards saved to study-sets/{study_set}-unique.tsv")
     else:
         print("No duplicates found!")
 
